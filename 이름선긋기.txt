@@ -1,0 +1,184 @@
+#include <Windows.h>
+#include<math.h>
+
+// - 전역변수 -
+//인스턴스: 윈도우OS가 현재 실행되고 있는 프로그램을 확인하기 위한 값
+//같은 프로그램이면 같은 인스턴스 값을 가진다
+HINSTANCE _hInstance;
+
+//윈도우 핸들: 윈도우창
+HWND _hWnd;
+
+//윈도우 타이틀
+LPTSTR _lpszClass = TEXT("Window API");
+
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
+//윈도우 메인함수
+int APIENTRY WinMain(HINSTANCE hInstance,
+   HINSTANCE hPrevInstance,
+   LPSTR lpszCmdParam,
+   int nCmdShow)
+{
+   //인스턴스를 전역변수에 담는다
+   _hInstance = hInstance;
+
+   //윈메인의 역할
+   //1. 윈도우 창을 세팅후 화면에 띄우기   
+   //   4가지를 모두 처리해야 화면에 창이 뜬다
+   //2. 메세지 루프
+
+   //WNDCLASS: 윈도우 창의 정보를 저장하기 위한 구조체
+   //1-1. 윈도우창 구조체 선언 및 초기화
+   WNDCLASS wndClass;
+   wndClass.cbClsExtra = 0;
+   wndClass.cbWndExtra = 0;
+   wndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+   wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+   wndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+   wndClass.hInstance = hInstance;
+   wndClass.lpfnWndProc = (WNDPROC)WndProc;
+   wndClass.lpszClassName = _lpszClass;
+   wndClass.lpszMenuName = NULL;
+   wndClass.style = CS_HREDRAW | CS_VREDRAW;
+
+   //1-2. 윈도우 클래스 등록
+   RegisterClass(&wndClass);
+
+   //1-3. 화면에 보여줄 윈도우 창을 생성
+   _hWnd = CreateWindow(
+      _lpszClass,            //윈도우 클래스의 이름
+      _lpszClass,            //윈도우 타이틀바 이름
+      WS_OVERLAPPEDWINDOW,   //윈도우 스타일
+      500,               //윈도우 화면 X좌표
+      100,               //윈도우 화면 Y좌표
+      800,               //윈도우 화면 가로크기
+      800,               //윈도우 화면 세로크기
+      NULL,               //부모 윈도우
+      (HMENU)NULL,         //메뉴핸들
+      hInstance,            //인스턴스 지정
+      NULL);               //윈도우의 자식 윈도우를 생성하면 지정하고 그렇지 않으면 NULL
+                        //(필요에 의해서 사용하지만 지금은 NULL)
+
+   //1-4 화면에 윈도우창 보여주기
+   ShowWindow(_hWnd, nCmdShow);
+
+   //MSG: 운영체제에서 발생하는 메세지 정보를 저장하기 위한 구조체
+   MSG message;
+
+   //2. 메세지 루프
+   while (GetMessage(&message, 0, 0, 0))
+   {
+      TranslateMessage(&message);
+      DispatchMessage(&message);
+   }
+
+   return message.wParam;
+}
+
+//윈도우 프로시져: 메세지를 운영체제에 전달
+//강제로 운영체제가 호출해준다
+
+//hWnd: 어느 윈도우에서 발생한 메세지인지 구분
+//iMessage: 메세지 구분 번호
+//wParam: unsigned int 마우스 버튼의 상태, 키보드 조합키의 상태를 전달
+//lParam: unsigned long 마우스 클릭 좌표를 전달
+
+
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
+{
+
+   HDC hdc;
+   PAINTSTRUCT ps;
+
+   switch (iMessage)
+   {
+   case WM_CREATE:
+      break;
+   case WM_PAINT:
+
+      hdc = BeginPaint(hWnd, &ps);
+      MoveToEx(hdc, 10, 10, NULL);
+      LineTo(hdc, 100, 10);
+      LineTo(hdc, 10, 100);
+
+      MoveToEx(hdc, 120, 10, NULL);
+      LineTo(hdc, 120, 100);
+
+      MoveToEx(hdc, 120, 120, NULL);
+      LineTo(hdc, 120, 180);
+
+      MoveToEx(hdc, 10, 120, NULL);
+      LineTo(hdc, 10, 180);
+
+      MoveToEx(hdc, 10, 120, NULL);
+      LineTo(hdc, 120, 120);
+
+      MoveToEx(hdc, 10, 180, NULL);
+      LineTo(hdc, 120, 180);
+
+      MoveToEx(hdc, 150, 10, NULL);
+      LineTo(hdc, 250, 10);
+
+      MoveToEx(hdc, 150, 10, NULL);
+      LineTo(hdc, 150, 60);
+
+      MoveToEx(hdc, 150, 60, NULL);
+      LineTo(hdc, 250, 60);
+
+      MoveToEx(hdc, 200, 70, NULL);
+      LineTo(hdc, 200, 100);
+
+      MoveToEx(hdc, 150, 100, NULL);
+      LineTo(hdc, 250, 100);
+
+
+      for (float i = 0; i < 180; i+=0.1)
+      {
+         MoveToEx(hdc, 200 + 20 * sin(i*3.1416 / 180) * 2, 150 + 20 * cos(i*3.1416 / 180) * 2, NULL);
+         LineTo(hdc, 200 + 20 * sin(i + 1 * 3.1416 / 180) * 2, 150 + 20 * cos(i + 1 * 3.1416 / 180) * 2);
+      }
+
+      for (float i = 0; i < 180; i += 0.1)
+      {
+         MoveToEx(hdc, 300 + 20 * sin(i*3.1416 / 180) * 2, 50 + 20 * cos(i*3.1416 / 180) * 2, NULL);
+         LineTo(hdc, 300 + 20 * sin(i + 1 * 3.1416 / 180) * 2, 50 + 20 * cos(i + 1 * 3.1416 / 180) * 2);
+      }
+
+      MoveToEx(hdc, 280, 100, NULL);
+      LineTo(hdc, 350, 100);
+
+      MoveToEx(hdc, 150, 100, NULL);
+      LineTo(hdc, 250, 100);
+
+      MoveToEx(hdc, 320, 100, NULL);
+      LineTo(hdc, 320, 150);
+
+      MoveToEx(hdc, 400, 10, NULL);
+      LineTo(hdc, 400, 150);
+
+      MoveToEx(hdc, 350, 120, NULL);
+      LineTo(hdc, 400, 120);
+
+      MoveToEx(hdc, 300, 130, NULL);
+      LineTo(hdc, 300, 180);
+
+      MoveToEx(hdc, 300, 130, NULL);
+      LineTo(hdc, 300, 180);
+
+      MoveToEx(hdc, 300, 180, NULL);
+      LineTo(hdc, 400, 180);
+      break;
+
+   case WM_DESTROY:
+      PostQuitMessage(0);
+      return 0;
+
+   case VK_ESCAPE:      //esc 키를 누르면 화면종료
+      PostMessage(hWnd, WM_DESTROY, 0, 0);
+      break;
+   }
+
+   return (DefWindowProc(hWnd, iMessage, wParam, lParam));
+}
